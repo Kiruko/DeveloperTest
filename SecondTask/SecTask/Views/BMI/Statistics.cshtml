@@ -1,0 +1,110 @@
+﻿@model BMIDataView
+@{
+    ViewData["Title"] = "Статистика";
+}
+
+
+<div class="chart-container">
+    <div class="chart-wrapper">
+        <h2>Общая статистика</h2>
+        <canvas id="pieChart"></canvas>
+    </div>
+    <div class="chart-wrapper" style="padding-left: 100px;">
+        <h2>Статистика в разрезе возрастов</h2>
+        <canvas id="barChart"></canvas>
+    </div>
+</div>
+
+<script>
+    fetch('/GetStatistics')
+        .then(response => response.text())
+        .then(data => {
+            // Сохранение результата в переменную
+            var pieData = JSON.parse(data);
+
+            // Подготовка данных для круговой диаграммы
+            var pieLabels = Object.keys(pieData);
+            var pieValues = Object.values(pieData);
+
+            // Создание круговой диаграммы
+            var pieCtx = document.getElementById('pieChart').getContext('2d');
+            var pieChart = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: pieLabels,
+                    datasets: [{
+                        data: pieValues,
+                        backgroundColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+
+            console.log(pieData);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+</script>
+
+<script>
+    fetch('/GetStatisticsAge')
+        .then(response => response.text())
+        .then(data => {
+            // Сохранение результата в переменную
+            var barData = JSON.parse(data);
+
+            // Массивы для оси X и характеристик
+            var ageRanges = Object.keys(barData);
+            var characteristics = Object.keys(barData[ageRanges[0]]);
+
+            // Массив данных для графика
+            var chartData = characteristics.map(function (characteristic) {
+                return ageRanges.map(function (ageRange) {
+                    return barData[ageRange][characteristic];
+                });
+            });
+
+            var colors = ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)', 'rgba(255, 205, 86, 0.5)', 'rgba(75, 192, 192, 0.5)'];
+
+            // Создание графика
+            var barCtx = document.getElementById('barChart').getContext('2d');
+            var barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ageRanges,
+                    datasets: characteristics.map(function (characteristic, index) {
+                        return {
+                            label: characteristic,
+                            data: chartData[index],
+                            backgroundColor: colors[index % colors.length],
+                            borderColor: colors[index % colors.length],
+                            borderWidth: 1
+                        };
+                    })
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            console.log(barData);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+</script>
+

@@ -1,52 +1,74 @@
 namespace Library
 {
+    /// <summary>
+    /// Метод one принимает на вход строку inputValue
+    /// и возвращает в качестве результата последовательность
+    /// символов от 1 до inputValue.
+    /// </summary>
     public class ZadanieOne
     {
-        public static void One()
+        private static int _minimalInputValue = 1;
+
+        public static string One(string inputValue)
         {
-            int n;
-            Console.Write("Введите число N: ");
-            if (!(int.TryParse(Console.ReadLine(), out n)))
+            try
             {
-                Console.WriteLine("Некорректный ввод."); //If N is not a number, exit the function.
-                return;
+                int n = Int32.Parse(inputValue);
+                if (n < _minimalInputValue) return $"Введённое число меньше {_minimalInputValue}.";
+                return string.Join(", ", Enumerable.Range(1, n));
             }
-            else if (n < 1)
+            catch (FormatException)
             {
-                Console.WriteLine("Введённое число меньше единицы."); //If N < 1, exit the function.
-                return;
+                return "Неверный формат числа.";
             }
-            string result = string.Join(", ", Enumerable.Range(1, n));
-            Console.WriteLine(result);
+            catch (OverflowException)
+            {
+                return "Число слишком большое.";
+            }
         }
     }
+
+    /// <summary>
+    /// Метод Two принимает на вход строку inputValue
+    /// и возвращает в качестве результата объект.
+    /// В случае ошибки ввода в качестве результата
+    /// вернётся строка с ошибкой, иначе вернётся двумерный массив
+    /// символов '#' (квадрат) с "дыркой" в центре.
+    /// </summary>
     public class ZadanieTwo
     {
-        public static void Two()
+        private static int _minimalInputValue = 3;
+
+        public static object Two(string inputValue)
         {
-            Console.Write("Введите нечетное число N: ");
-            int n;
-            if (!(int.TryParse(Console.ReadLine(), out n)))
+            try
             {
-                Console.WriteLine("Некорректный ввод."); //If N is not a number, exit the function.
-                return;
-            }
-            if (n < 3)
-            {
-                Console.WriteLine("Введённое число меньше трёх."); //If N < 3, exit the function.
-                return;
-            }
-            if (n % 2 == 0) // If N is an even number, exit the function.
-            {
-                Console.WriteLine("Вы ввели четное N.");
-                return;
-            }            
-            for (int row = 1; row <= n; row++) {
-                for (int col = 1; col <= n; col++) {
-                    if (row == n / 2 + 1 && col == n / 2 + 1) Console.Write(" ");
-                    else Console.Write("#");                    
+                int n = Int32.Parse(inputValue);
+
+                if (n % 2 == 0) return "Введено чётное число.";
+                if (n < _minimalInputValue) return $"Введённое число меньше {_minimalInputValue}.";
+
+                char[,] result = new char[n, n];
+                int _center = n / 2;
+
+                for (int row = 0; row < n; row++)
+                {
+                    for (int col = 0; col < n; col++)
+                    {
+                        if (row == _center && col == _center) result[row, col] = ' ';
+                        else result[row, col] = '#';
+                    }
                 }
-                Console.WriteLine();
+
+                return result;
+            }
+            catch (FormatException)
+            {
+                return "Неверный формат числа.";
+            }
+            catch (OverflowException)
+            {
+                return "Число слишком большое.";
             }
         }
     }

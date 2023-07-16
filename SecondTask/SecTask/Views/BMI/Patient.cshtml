@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model PatientView
+@{
+    ViewData["Title"] = "Добавление пациента.";
+}
+
+<form method="post" id="patientForm" asp-controller="BMI" asp-action="AddPatient">
+
+    <h2>Добавление пациента в базу данных</h2>
+
+    <label asp-for="Name" for="NameInput"></label>
+    <input asp-for="Name" id="NameInput" />
+    <span asp-validation-for="Name"></span>
+
+    <label asp-for="Surname" for="SurnameInput"></label>
+    <input asp-for="Surname" id="SurnameInput" />
+    <span asp-validation-for="Surname"></span>
+
+    <label asp-for="Age" for="AgeInput"></label>
+    <input asp-for="Age" id="AgeInput" />
+    <span asp-validation-for="Age"></span>
+
+    <label asp-for="Weight" for="WeightInput"></label>
+    <input asp-for="Weight" id="WeightInput" />
+    <span asp-validation-for="Weight"></span>
+
+    <label asp-for="Height" for="HeightInput"></label>
+    <input asp-for="Height" id="HeightInput" />
+    <span asp-validation-for="Height"></span>
+
+    <button type="submit">Добавить</button>
+
+    <div id="resultMessage">
+        <p id="successMessage" class="hidden"></p>
+        <p id="errorMessage" class="hidden"></p>
+    </div>
+
+    @Html.ValidationSummary()
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('#patientForm').submit(function (e) {
+            e.preventDefault(); // Отменяем стандартное поведение формы
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    var successMessage = $('#successMessage');
+                    var errorMessage = $('#errorMessage');
+                    successMessage.addClass('hidden');
+                    errorMessage.addClass('hidden');
+
+                    if (response.success) {
+                        successMessage.text(response.message).removeClass('hidden');
+                    } else {
+                        errorMessage.text(response.message).removeClass('hidden');
+                    }
+                }
+            });
+        });
+    });
+</script>

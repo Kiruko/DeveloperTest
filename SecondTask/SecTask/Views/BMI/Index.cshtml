@@ -1,0 +1,70 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+
+@model BMI
+@{
+    ViewData["Title"] = "Индекс массы тела";
+}
+
+<form method="get" id="bmiForm" asp-controller="BMI" asp-action="CalculateBMI">
+
+    <h2>Калькулятор ИМТ</h2>
+
+    <label asp-for="Weight"></label>
+    <input asp-for="Weight" id="weightInput" />
+    <span asp-validation-for="Weight"></span>
+
+    <label asp-for="Height"></label>
+    <input asp-for="Height" id="heightInput" />
+    <span asp-validation-for="Height"></span>
+
+    <button type="submit">Рассчитать</button>
+
+</form>
+
+<div id="result">
+    <label id="bmiLabel"></label>
+    <label id="descriptionLabel"></label>
+    <label id="errorLabel"></label>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function () {
+        $('#bmiForm').submit(function (event) {
+            event.preventDefault(); // Предотвращает отправку формы по умолчанию
+
+            var weight = parseFloat($('#weightInput').val());
+            var height = parseFloat($('#heightInput').val());
+
+            if (isNaN(weight) || isNaN(height)) {
+                var errorLabel = $('#errorLabel');
+                errorLabel.text('Не оставляйте поля пустыми.');
+
+                $('#bmiLabel, #descriptionLabel').empty();
+                return;
+            }
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'GET',
+                data: { weight: weight, height: height },
+                success: function (data) {
+                    var bmiLabel = $('#bmiLabel');
+                    bmiLabel.text('ИМТ: ' + data.bmi.toFixed(1));
+
+                    var descriptionLabel = $('#descriptionLabel');
+                    descriptionLabel.text('Описание: ' + data.description);
+
+                    var errorLabel = $('#errorLabel');
+                    errorLabel.empty();
+                },
+                error: function () {
+                    var errorLabel = $('#errorLabel');
+                    errorLabel.text('Введены некорректные данные.');
+
+                    $('#bmiLabel, #descriptionLabel').empty();
+                }
+            });
+        });
+    });
+</script>
